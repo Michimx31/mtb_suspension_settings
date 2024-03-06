@@ -8,32 +8,7 @@ void main() {
 
 // Reifendruck vorne hinten fehlt noch 
 
-/*class Bicycle {
-  final String brand;
-  final String model;
-  double pressure;
-  double highSpeedRebound;
-  double highSpeedDamping;
-  double lowSpeedRebound;
-  double lowSpeedDamping;
-  bool like;
-  //List<BicycleSettings> settingsHistory;
-  List<ShockSettings> shocksettingsHistory;
-  List<ForkSettings> forksettingsHistory;
 
-  Bicycle({
-    required this.brand,
-    required this.model,
-    required this.pressure,
-    required this.highSpeedRebound,
-    required this.highSpeedDamping,
-    required this.lowSpeedRebound,
-    required this.lowSpeedDamping,
-    this.like = false,
-    this.shocksettingsHistory = const [],
-    this.forksettingsHistory = const [],
-  });
-} */
 
 class Bicycle {
   final String brand;
@@ -76,28 +51,7 @@ class BicycleSettings {
   });
 }
 
-/*
-class BicycleSettings {
-  final DateTime dateTime;
-  final double pressure;
-  final double highSpeedRebound;
-  final double highSpeedDamping;
-  final double lowSpeedRebound;
-  final double lowSpeedDamping;
-  final bool likeSetting;
-  final String comment;
 
-  BicycleSettings({
-    required this.dateTime,
-    required this.pressure,
-    required this.highSpeedRebound,
-    required this.highSpeedDamping,
-    required this.lowSpeedRebound,
-    required this.lowSpeedDamping,
-    required this.likeSetting,
-    required this.comment,
-  });
-}*/
 
 
 
@@ -143,7 +97,6 @@ class _BicycleListState extends State<BicycleList> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    //builder: (context) => BicycleDetails(bicycle: bicycles[index]),
                     builder: (context) => SuspensionSettingsScreen(bicycle: bicycles[index]),
                   ),
                 );
@@ -222,19 +175,7 @@ class _AddBicycleScreenState extends State<AddBicycleScreen> {
         brand: brandController.text,
         model: modelController.text,
         forkSettings: BicycleSettings(dateTime: DateTime.now()),
-        shockSettings: BicycleSettings(dateTime: DateTime.now()),
-        /*pressure: 0, // Default value for pressure
-        shock_pressure: 0, // Default value for pressure
-        fork_HighSpeedDamping: 0, // Default value for high-speed rebound
-        fork_LowSpeedDamping: 0, // Default value for high-speed damping
-        fork_LowSpeedRebound: 0, // Default value for low-speed rebound
-        fork_HighSpeedRebound: 0, // Default value for low-speed damping
-        shock_HighSpeedRebound: 0, // Default value for high-speed rebound
-        shock_LowSpeedRebound: 0, // Default value for high-speed damping
-        shock_LowSpeedDamping: 0, // Default value for low-speed rebound
-        shock_HighSpeedDamping: 0, // Default value for low-speed damping
-        */
-      );
+        shockSettings: BicycleSettings(dateTime: DateTime.now()), );
 
       Navigator.pop(context, newBicycle);
     } else {
@@ -276,6 +217,8 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
 
   late BicycleSettings currentForkSettings;
   late BicycleSettings currentShockSettings;
+
+  
   
   @override
   void initState() {
@@ -306,7 +249,8 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Card(
+            InkWell(
+              child: Card(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -314,69 +258,57 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
                   children: [
                     Text('Fork Settings', style: Theme.of(context).textTheme.headline6),
                     SizedBox(height: 10),
-                    Text('Air Pressure: ${widget.bicycle.forkSettings.pressure}'),
-                    Text('LSR: ${widget.bicycle.forkSettings.lowSpeedRebound}'),
-                    Text('HSR: ${widget.bicycle.forkSettings.highSpeedRebound}'),
-                    Text('LSC: ${widget.bicycle.forkSettings.lowSpeedDamping}'),
-                    Text('HSC: ${widget.bicycle.forkSettings.highSpeedDamping}'),
-                    /*Text('Air Pressure: ${widget.bicycle.fork_pressure}'),
-                    Text('LSR: ${widget.bicycle.fork_LowSpeedRebound}'),
-                    Text('HSR: ${widget.bicycle.fork_HighSpeedRebound}'),
-                    Text('LSC: ${widget.bicycle.fork_LowSpeedDamping}'),
-                    Text('HSC: ${widget.bicycle.fork_HighSpeedDamping}'),*/
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            currentSettings = widget.bicycle.forkSettings;
+                    Text('Air Pressure: ${widget.bicycle.forkSettings.pressure} psi'),
+                    Text('LSR: ${widget.bicycle.forkSettings.lowSpeedRebound} clicks'),
+                    Text('HSR: ${widget.bicycle.forkSettings.highSpeedRebound} clicks'),
+                    Text('LSC: ${widget.bicycle.forkSettings.lowSpeedDamping} clicks'),
+                    Text('HSC: ${widget.bicycle.forkSettings.highSpeedDamping} clicks'),
+                                                                                                  
+                    SizedBox(height: 10),
+                    
+                  ],
+                ),
+              ),
+            ),
+            onTap: (){
+              currentSettings = widget.bicycle.forkSettings;
                             Navigator.push(
                               context,                          
                                MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle , suspensionSettings: currentForkSettings, updateSettings: updateSettings)),
-                              //MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle , suspensionSettings: currentSettings)),
-                            );
-                          },
-                          child: Text('Adjust Shock Settings'),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    
-                  ],
+                              );
+                          },                      
+            ),        
+            InkWell(
+              child:
+                Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Shock Settings', style: Theme.of(context).textTheme.headline6),
+                      SizedBox(height: 10),
+                      Text('Air Pressure: ${widget.bicycle.shockSettings.pressure} psi'),
+                      Text('LSR: ${widget.bicycle.shockSettings.lowSpeedRebound} clicks'),
+                      Text('HSR: ${widget.bicycle.shockSettings.highSpeedRebound} clicks'),
+                      Text('LSC: ${widget.bicycle.shockSettings.lowSpeedDamping} clicks'),
+                      Text('HSC: ${widget.bicycle.shockSettings.highSpeedDamping} clicks'),
+                      
+                      SizedBox(height: 10),
+                      
+                    ],
+                  ),
                 ),
-              ),
+              ), 
+              onTap: (){
+              currentSettings = widget.bicycle.forkSettings;
+                            Navigator.push(
+                              context,                          
+                               MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle , suspensionSettings: currentShockSettings, updateSettings: updateSettings)),
+                                                          );
+                          },  
             ),
             
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Rear Shock Settings', style: Theme.of(context).textTheme.headline6),
-                    SizedBox(height: 10),
-                    Text('Air Pressure: ${widget.bicycle.shockSettings.pressure}'),
-                    Text('LSR: ${widget.bicycle.shockSettings.lowSpeedRebound}'),
-                    Text('HSR: ${widget.bicycle.shockSettings.highSpeedRebound}'),
-                    Text('LSC: ${widget.bicycle.shockSettings.lowSpeedDamping}'),
-                    Text('HSC: ${widget.bicycle.shockSettings.highSpeedDamping}'),
-                    ElevatedButton(
-                      onPressed: () {
-                        currentSettings = widget.bicycle.shockSettings;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle , suspensionSettings: currentShockSettings,updateSettings: updateSettings)),
-                          //MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle, suspensionSettings: currentSettings ,)),
-                        );
-                      },
-                      child: Text('Adjust Shock Settings'),
-                    ),
-                    SizedBox(height: 10),
-                    
-                  ],
-                ),
-              ),
-            ),
             SizedBox(height: 20),
             ElevatedButton(
                       onPressed: () {
@@ -404,22 +336,34 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
 // Bisheriger Code 
 class BicycleDetails extends StatefulWidget {
   final Bicycle bicycle;
-  // added for differentation between shock and fork
   final BicycleSettings suspensionSettings;
-
-  // Funktion zum Aktualisieren der Einstellungen
   final Function(BicycleSettings) updateSettings;
 
-  BicycleDetails({required this.bicycle, required this.suspensionSettings,required this.updateSettings});
+  BicycleDetails({required this.bicycle, required this.suspensionSettings, required this.updateSettings});
 
   @override
   _BicycleDetailsState createState() => _BicycleDetailsState();
 }
 
 class _BicycleDetailsState extends State<BicycleDetails> {
-  bool highSpeedEnabled = false;
   bool liked = false;
   String comment = '';
+
+  late double pressureValue;
+  late double highSpeedReboundValue;
+  late double highSpeedDampingValue;
+  late double lowSpeedReboundValue;
+  late double lowSpeedDampingValue;
+
+  @override
+  void initState() {
+    super.initState();
+    pressureValue = widget.suspensionSettings.pressure;
+    highSpeedReboundValue = widget.suspensionSettings.highSpeedRebound;
+    highSpeedDampingValue = widget.suspensionSettings.highSpeedDamping;
+    lowSpeedReboundValue = widget.suspensionSettings.lowSpeedRebound;
+    lowSpeedDampingValue = widget.suspensionSettings.lowSpeedDamping;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -431,20 +375,37 @@ class _BicycleDetailsState extends State<BicycleDetails> {
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: 
-          <Widget>[
-            Text('Pressure: ${widget.suspensionSettings.pressure}'),
-            Text('High-Speed Rebound: ${widget.suspensionSettings.highSpeedRebound}'),
-            Text('High-Speed Damping: ${widget.suspensionSettings.highSpeedDamping}'),
-            Text('Low-Speed Rebound: ${widget.suspensionSettings.lowSpeedRebound}'),
-            Text('Low-Speed Damping: ${widget.suspensionSettings.lowSpeedDamping}'),
-            SizedBox(height: 25),
-            ElevatedButton(
-              onPressed: () {
-                _showSettingsDialog(context);
-              },
-              child: Text('Adjust Settings'),
-            ),
+          children: <Widget>[
+            _buildSettingRow('Pressure', pressureValue, (value) {
+              setState(() {
+                pressureValue = value;
+                widget.suspensionSettings.pressure = value;
+              });
+            }),
+            _buildSettingRow('High-Speed Rebound', highSpeedReboundValue, (value) {
+              setState(() {
+                highSpeedReboundValue = value;
+                widget.suspensionSettings.highSpeedRebound = value;
+              });
+            }),
+            _buildSettingRow('High-Speed Damping', highSpeedDampingValue, (value) {
+              setState(() {
+                highSpeedDampingValue = value;
+                widget.suspensionSettings.highSpeedDamping = value;
+              });
+            }),
+            _buildSettingRow('Low-Speed Rebound', lowSpeedReboundValue, (value) {
+              setState(() {
+                lowSpeedReboundValue = value;
+                widget.suspensionSettings.lowSpeedRebound = value;
+              });
+            }),
+            _buildSettingRow('Low-Speed Damping', lowSpeedDampingValue, (value) {
+              setState(() {
+                lowSpeedDampingValue = value;
+                widget.suspensionSettings.lowSpeedDamping = value;
+              });
+            }),
             SizedBox(height: 25),
             Row(
               children: [
@@ -453,175 +414,93 @@ class _BicycleDetailsState extends State<BicycleDetails> {
                   onPressed: () {
                     setState(() {
                       liked = !liked;
-                      if (liked) {
-                        widget.suspensionSettings.like = true;
-                      } else {
-                        widget.suspensionSettings.like = false;
-                      }
+                      widget.suspensionSettings.like = liked;
                     });
                   },
                 ),
                 Text('Do you like this Setting: ${widget.suspensionSettings.like}'),
               ],
             ),
-            SizedBox(height: 20), 
-            SizedBox(
-              width: 500,
-              child: 
-                TextField(
-                //selectionWidthStyle: BoxWidthStyle.values,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Leave a comment',
-                  /*labelText: 'Comment'*/),
-                onChanged: (value) {
-                  setState(() {
-                    comment = value;
-                  });
-                },
+            SizedBox(height: 20),
+            TextField(
+              controller: TextEditingController(text: comment),
+              decoration: InputDecoration(
+                labelText: 'Leave a comment',
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                setState(() {
+                  comment = value;
+                });
+              },
             ),
-
-            
-            SizedBox(height: 20), 
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                _saveSettings(context);
-                final updatedSettings = widget.suspensionSettings;
-                Navigator.pop(context,updatedSettings);
+                _saveSettings();
               },
               child: Text('Save to history'),
-            ),  
-            SizedBox(height: 20),           
-            /*ElevatedButton(
-              onPressed: () {
-                _showSettingsHistory(context);
-              },
-              child: Text('View History'),
-            ),*/
+            ),
+            SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  void _showSettingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Adjust Suspension Settings'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                decoration: InputDecoration(labelText: 'Pressure'),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  setState(() {
-                    widget.suspensionSettings.pressure = double.tryParse(value) ?? 0;
-                  });
-                },
-              ),
-
-                TextField(
-                  decoration: InputDecoration(labelText: 'High-Speed Rebound'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      widget.suspensionSettings.highSpeedRebound = double.tryParse(value) ?? 0;
-                    });
-                  },
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'High-Speed Damping'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      widget.suspensionSettings.highSpeedDamping = double.tryParse(value) ?? 0;
-                    });
-                  },
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Low-Speed Rebound'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      widget.suspensionSettings.lowSpeedRebound = double.tryParse(value) ?? 0;
-                    });
-                  },
-                ),
-                TextField(
-                  decoration: InputDecoration(labelText: 'Low-Speed Damping'),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    setState(() {
-                      widget.suspensionSettings.lowSpeedDamping = double.tryParse(value) ?? 0;
-                    });
-                  },
-                ),
-                
-              ],
-
+  Widget _buildSettingRow(String label, double value, Function(double) onChanged) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(fontSize: 16),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);                
-              },
-              child: Text('Ok'),
-            ),
-            /*TextButton(
-              onPressed: () {
-                _saveSettings(context);
-                Navigator.pop(context );
-              },
-              child: Text('Save actual settings to history'),
-            ),*/
-          ],
-        );
-      },
+        ),
+        IconButton(
+          icon: Icon(Icons.remove),
+          onPressed: () {
+            setState(() {
+              value -= 1;
+              if (value < 0) value = 0;
+              onChanged(value);
+            });
+          },
+        ),
+        Text(value.toString(), style: TextStyle(fontSize: 16)),
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () {
+            setState(() {
+              value += 1;
+              onChanged(value);
+            });
+          },
+        ),
+      ],
     );
   }
 
-  void _saveSettings(BuildContext context) {
+  void _saveSettings() {
     final dateTime = DateTime.now();
     final settings = BicycleSettings(
-    dateTime: dateTime,
-    pressure: widget.suspensionSettings.pressure,
-    highSpeedRebound: widget.suspensionSettings.highSpeedRebound,
-    highSpeedDamping: widget.suspensionSettings.highSpeedDamping,
-    lowSpeedRebound: widget.suspensionSettings.lowSpeedRebound,
-    lowSpeedDamping: widget.suspensionSettings.lowSpeedDamping,
-    likeSetting: widget.suspensionSettings.like,
-
-    /*pressure: widget.bicycle.pressure,
-    highSpeedRebound: widget.bicycle.highSpeedRebound,
-    highSpeedDamping: widget.bicycle.highSpeedDamping,
-    lowSpeedRebound: widget.bicycle.lowSpeedRebound,
-    lowSpeedDamping: widget.bicycle.lowSpeedDamping,
-    likeSetting: widget.bicycle.like,*/
-    comment: comment,
-    
+      dateTime: dateTime,
+      pressure: widget.suspensionSettings.pressure,
+      highSpeedRebound: widget.suspensionSettings.highSpeedRebound,
+      highSpeedDamping: widget.suspensionSettings.highSpeedDamping,
+      lowSpeedRebound: widget.suspensionSettings.lowSpeedRebound,
+      lowSpeedDamping: widget.suspensionSettings.lowSpeedDamping,
+      likeSetting: widget.suspensionSettings.like,
+      comment: comment,
     );
 
-    setState(() {   
-      widget.updateSettings(widget.suspensionSettings); // Aufruf der Update-Funktion
-      //widget.bicycle.forkSettings.pressure =  widget.suspensionSettings.pressure;
-      widget.bicycle.settingsHistory = [...widget.bicycle.settingsHistory,settings];
-    });
-  }
-
-  // implementieren das man in Historie sieht ob Gabel oder Dämpfer verändert wurde
-  void _showSettingsHistory(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SettingsHistoryScreen(settings: widget.bicycle.settingsHistory),
-      ),
-    );
+    widget.updateSettings(widget.suspensionSettings);
+    widget.bicycle.settingsHistory = [...widget.bicycle.settingsHistory, settings];
+    Navigator.pop(context, widget.suspensionSettings);
   }
 }
+
+
 
 class SettingsHistoryScreen extends StatelessWidget {
   final List<BicycleSettings> settings;
