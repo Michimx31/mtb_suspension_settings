@@ -55,7 +55,9 @@ class SuspensionSettings {
 
 
 
-
+String getLikeSettingDisplay(bool likeSetting) {
+  return likeSetting ? 'Yes' : 'No';
+}
 
 
 
@@ -348,6 +350,7 @@ class BicycleDetails extends StatefulWidget {
 }
 
 class _BicycleDetailsState extends State<BicycleDetails> {
+  final TextEditingController commentController = TextEditingController();
   bool liked = false;
   String comment = '';
 
@@ -420,21 +423,13 @@ class _BicycleDetailsState extends State<BicycleDetails> {
                     });
                   },
                 ),
-                Text('Do you like this Setting: ${widget.suspensionSettings.like}'),
+                Text('Do you like this Setting: ${getLikeSettingDisplay(widget.suspensionSettings.like)}'),
               ],
             ),
             SizedBox(height: 20),
             TextField(
-              controller: TextEditingController(text: comment),
-              decoration: InputDecoration(
-                labelText: 'Leave a comment',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  comment = value;
-                });
-              },
+              controller: commentController,
+              decoration: InputDecoration(labelText: 'Comment'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -484,6 +479,7 @@ class _BicycleDetailsState extends State<BicycleDetails> {
   }
 
   void _saveSettings() {
+    final comment = commentController.text;
     final dateTime = DateTime.now();
     final settings = SuspensionSettings(
       dateTime: dateTime,
@@ -601,7 +597,8 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
               Text('High-Speed Damping: ${setting.highSpeedDamping}'),
               Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
               Text('Low-Speed Damping: ${setting.lowSpeedRebound}'),
-              Text('Fork Setting was good: ${setting.likeSetting}'),
+              //Text('Fork Setting was good: ${setting.likeSetting}'),
+              Text('Fork Setting was good: ${getLikeSettingDisplay(setting.likeSetting)}'),
               Text('Fork Comment: ${setting.comment}'),
               SizedBox(height: 10),
             ],
@@ -612,7 +609,7 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
               Text('High-Speed Damping: ${setting.highSpeedDamping}'),
               Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
               Text('Low-Speed Damping: ${setting.lowSpeedDamping}'),
-              Text('Shock Setting was good: ${setting.likeSetting}'),
+              Text('Fork Setting was good: ${getLikeSettingDisplay(setting.likeSetting)}'),
               Text('Shock Comment: ${setting.comment}'),
               SizedBox(height: 10),
             ],
