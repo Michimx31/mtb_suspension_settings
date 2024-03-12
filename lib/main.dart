@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(BicycleApp());
@@ -15,7 +14,8 @@ class Bicycle {
   final String model;
   final BicycleSettings forkSettings; 
   final BicycleSettings shockSettings;
-  List<BicycleSettings> settingsHistory;
+  List<BicycleSettings> forkSettingsHistory;
+  List<BicycleSettings> shockSettingsHistory;
   
 
   Bicycle({
@@ -23,7 +23,8 @@ class Bicycle {
     required this.model,
     required this.forkSettings,
     required this.shockSettings,
-    this.settingsHistory = const [],    
+    this.forkSettingsHistory = const [],    
+    this.shockSettingsHistory = const [],
   });
 }
 
@@ -326,7 +327,7 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SettingsHistoryScreen(settings: widget.bicycle.settingsHistory),
+        builder: (context) => SettingsHistoryScreen(forkSettings: widget.bicycle.forkSettingsHistory,shockSettings: [widget.bicycle.shockSettings],),
       ),
     );
   }
@@ -439,7 +440,7 @@ class _BicycleDetailsState extends State<BicycleDetails> {
               onPressed: () {
                 _saveSettings();
               },
-              child: Text('Save to history'),
+              child: Text('Save Settings'),
             ),
             SizedBox(height: 20),
           ],
@@ -482,53 +483,76 @@ class _BicycleDetailsState extends State<BicycleDetails> {
   }
 
   void _saveSettings() {
-    final dateTime = DateTime.now();
-    final settings = BicycleSettings(
-      dateTime: dateTime,
-      pressure: widget.suspensionSettings.pressure,
-      highSpeedRebound: widget.suspensionSettings.highSpeedRebound,
-      highSpeedDamping: widget.suspensionSettings.highSpeedDamping,
-      lowSpeedRebound: widget.suspensionSettings.lowSpeedRebound,
-      lowSpeedDamping: widget.suspensionSettings.lowSpeedDamping,
-      likeSetting: widget.suspensionSettings.like,
-      comment: comment,
-    );
+  final dateTime = DateTime.now();
+  final settings = BicycleSettings(
+    dateTime: dateTime,
+    pressure: widget.suspensionSettings.pressure,
+    highSpeedRebound: widget.suspensionSettings.highSpeedRebound,
+    highSpeedDamping: widget.suspensionSettings.highSpeedDamping,
+    lowSpeedRebound: widget.suspensionSettings.lowSpeedRebound,
+    lowSpeedDamping: widget.suspensionSettings.lowSpeedDamping,
+    likeSetting: widget.suspensionSettings.like,
+    comment: comment,
+  );
 
-    widget.updateSettings(widget.suspensionSettings);
-    widget.bicycle.settingsHistory = [...widget.bicycle.settingsHistory, settings];
-    Navigator.pop(context, widget.suspensionSettings);
+  widget.updateSettings(widget.suspensionSettings);
+
+  if (widget.suspensionSettings == widget.bicycle.forkSettings) {
+    widget.bicycle.forkSettingsHistory = [...widget.bicycle.forkSettingsHistory, settings];
+  } else if (widget.suspensionSettings == widget.bicycle.shockSettings) {
+    widget.bicycle.shockSettingsHistory = [...widget.bicycle.shockSettingsHistory, settings];
   }
+
+  Navigator.pop(context, widget.suspensionSettings);
+}
 }
 
 
 
 class SettingsHistoryScreen extends StatelessWidget {
-  final List<BicycleSettings> settings;
+  final List<BicycleSettings> forkSettings;
+  final List<BicycleSettings> shockSettings;
 
-  SettingsHistoryScreen({required this.settings});
+  SettingsHistoryScreen({required this.forkSettings, required this.shockSettings});
 
   @override
   Widget build(BuildContext context) {
+    final itemCount = forkSettings.length < shockSettings.length ? forkSettings.length : shockSettings.length;
+    int maxItemCount = max(forkSettings.length, shockSettings.length);
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings History'),
       ),
       body: ListView.builder(
-        itemCount: settings.length,
+        
+        itemCount: maxItemCount,
+        
         itemBuilder: (context, index) {
-          final setting = settings[index];
+          final forkSetting = forkSettings[index];
+          final shockSetting = shockSettings[index];
           return ListTile(
-            title: Text('Date: ${setting.dateTime.toString()}'),
+            title: Text('Date: ${forkSetting.dateTime.toString().substring(0,19)}'),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Pressure: ${setting.pressure}'),
-                Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
-                Text('High-Speed Damping: ${setting.highSpeedDamping}'),
-                Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
-                Text('Low-Speed Damping: ${setting.lowSpeedDamping}'),
-                Text('Setting was good: ${setting.likeSetting}'),
-                Text('Comment: ${setting.comment}'),
+                Text('Fork Settings', style: Theme.of(context).textTheme.headline6),
+                Text('Pressure: ${forkSetting.pressure}'),
+                Text('High-Speed Rebound: ${forkSetting.highSpeedRebound}'),
+                Text('High-Speed Damping: ${forkSetting.highSpeedDamping}'),
+                Text('Low-Speed Rebound: ${forkSetting.lowSpeedRebound}'),
+                Text('Low-Speed Damping: ${forkSetting.lowSpeedDamping}'),
+                Text('Setting was good: ${forkSetting.likeSetting}'),
+                Text('Comment: ${forkSetting.comment}'),
+                Divider(),
+                Text('Shock Settings', style: Theme.of(context).textTheme.headline6),
+                Text('Date: ${shockSetting.dateTime.toString().substring(0,19)}'),
+                Text('Pressure: ${shockSetting.pressure}'),
+                Text('High-Speed Rebound: ${shockSetting.highSpeedRebound}'),
+                Text('High-Speed Damping: ${shockSetting.highSpeedDamping}'),
+                Text('Low-Speed Rebound: ${shockSetting.lowSpeedRebound}'),
+                Text('Low-Speed Damping: ${shockSetting.lowSpeedDamping}'),
+                Text('Setting was good: ${shockSetting.likeSetting}'),
+                Text('Comment: ${shockSetting.comment}'),
               ],
             ),
           );
