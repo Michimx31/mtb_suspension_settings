@@ -1,5 +1,6 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 void main() {
   runApp(BicycleApp());
@@ -12,10 +13,10 @@ void main() {
 class Bicycle {
   final String brand;
   final String model;
-  final BicycleSettings forkSettings; 
-  final BicycleSettings shockSettings;
-  List<BicycleSettings> forkSettingsHistory;
-  List<BicycleSettings> shockSettingsHistory;
+  final SuspensionSettings forkSettings; 
+  final SuspensionSettings shockSettings;
+  List<SuspensionSettings> forksettingsHistory;
+  List<SuspensionSettings> shocksettingsHistory;
   
 
   Bicycle({
@@ -23,12 +24,12 @@ class Bicycle {
     required this.model,
     required this.forkSettings,
     required this.shockSettings,
-    this.forkSettingsHistory = const [],    
-    this.shockSettingsHistory = const [],
+    this.forksettingsHistory = const [], 
+    this.shocksettingsHistory = const [],   
   });
 }
 
-class BicycleSettings {
+class SuspensionSettings {
   final DateTime dateTime;
   double pressure;
   double highSpeedRebound;
@@ -39,7 +40,7 @@ class BicycleSettings {
   String comment;
   bool like;
 
-  BicycleSettings({
+  SuspensionSettings({
     required this.dateTime,
     this.pressure = 0,
     this.highSpeedRebound = 0,
@@ -175,8 +176,8 @@ class _AddBicycleScreenState extends State<AddBicycleScreen> {
       final newBicycle = Bicycle(
         brand: brandController.text,
         model: modelController.text,
-        forkSettings: BicycleSettings(dateTime: DateTime.now()),
-        shockSettings: BicycleSettings(dateTime: DateTime.now()), );
+        forkSettings: SuspensionSettings(dateTime: DateTime.now()),
+        shockSettings: SuspensionSettings(dateTime: DateTime.now()), );
 
       Navigator.pop(context, newBicycle);
     } else {
@@ -214,10 +215,10 @@ class SuspensionSettingsScreen extends StatefulWidget {
 }
 
 class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
-  late BicycleSettings currentSettings;
+  late SuspensionSettings currentSettings;
 
-  late BicycleSettings currentForkSettings;
-  late BicycleSettings currentShockSettings;
+  late SuspensionSettings currentForkSettings;
+  late SuspensionSettings currentShockSettings;
 
   
   
@@ -229,7 +230,7 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
   } 
 
   // Funktion zum Aktualisieren der Einstellungen
-  void updateSettings(BicycleSettings settings) {
+  void updateSettings(SuspensionSettings settings) {
     setState(() {
       if (settings == widget.bicycle.forkSettings) {
         currentForkSettings = settings;
@@ -327,7 +328,7 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SettingsHistoryScreen(forkSettings: widget.bicycle.forkSettingsHistory,shockSettings: [widget.bicycle.shockSettings],),
+        builder: (context) => SuspensionHistoryScreen(forkSettingsHistory: widget.bicycle.forksettingsHistory,shockSettingsHistory: widget.bicycle.shocksettingsHistory),
       ),
     );
   }
@@ -337,8 +338,8 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
 // Bisheriger Code 
 class BicycleDetails extends StatefulWidget {
   final Bicycle bicycle;
-  final BicycleSettings suspensionSettings;
-  final Function(BicycleSettings) updateSettings;
+  final SuspensionSettings suspensionSettings;
+  final Function(SuspensionSettings) updateSettings;
 
   BicycleDetails({required this.bicycle, required this.suspensionSettings, required this.updateSettings});
 
@@ -440,7 +441,7 @@ class _BicycleDetailsState extends State<BicycleDetails> {
               onPressed: () {
                 _saveSettings();
               },
-              child: Text('Save Settings'),
+              child: Text('Save to history'),
             ),
             SizedBox(height: 20),
           ],
@@ -483,80 +484,125 @@ class _BicycleDetailsState extends State<BicycleDetails> {
   }
 
   void _saveSettings() {
-  final dateTime = DateTime.now();
-  final settings = BicycleSettings(
-    dateTime: dateTime,
-    pressure: widget.suspensionSettings.pressure,
-    highSpeedRebound: widget.suspensionSettings.highSpeedRebound,
-    highSpeedDamping: widget.suspensionSettings.highSpeedDamping,
-    lowSpeedRebound: widget.suspensionSettings.lowSpeedRebound,
-    lowSpeedDamping: widget.suspensionSettings.lowSpeedDamping,
-    likeSetting: widget.suspensionSettings.like,
-    comment: comment,
-  );
+    final dateTime = DateTime.now();
+    final settings = SuspensionSettings(
+      dateTime: dateTime,
+      pressure: widget.suspensionSettings.pressure,
+      highSpeedRebound: widget.suspensionSettings.highSpeedRebound,
+      highSpeedDamping: widget.suspensionSettings.highSpeedDamping,
+      lowSpeedRebound: widget.suspensionSettings.lowSpeedRebound,
+      lowSpeedDamping: widget.suspensionSettings.lowSpeedDamping,
+      likeSetting: widget.suspensionSettings.like,
+      comment: comment,
+    );
 
-  widget.updateSettings(widget.suspensionSettings);
+    widget.updateSettings(widget.suspensionSettings);
+    //widget.bicycle.settingsHistory = [...widget.bicycle.settingsHistory, settings];
+    widget.bicycle.forksettingsHistory = [...widget.bicycle.forksettingsHistory, settings];
+    widget.bicycle.shocksettingsHistory = [...widget.bicycle.shocksettingsHistory, settings];
+    Navigator.pop(context);
 
-  if (widget.suspensionSettings == widget.bicycle.forkSettings) {
-    widget.bicycle.forkSettingsHistory = [...widget.bicycle.forkSettingsHistory, settings];
-  } else if (widget.suspensionSettings == widget.bicycle.shockSettings) {
-    widget.bicycle.shockSettingsHistory = [...widget.bicycle.shockSettingsHistory, settings];
+    Navigator.pop(context, widget.suspensionSettings);
+  }   
+
+    
+}
+
+
+
+class SuspensionHistoryScreen extends StatefulWidget {
+  final List<SuspensionSettings> forkSettingsHistory;
+  final List<SuspensionSettings> shockSettingsHistory;
+
+  SuspensionHistoryScreen({
+    required this.forkSettingsHistory,
+    required this.shockSettingsHistory,
+  });
+
+  @override
+  _SuspensionHistoryScreenState createState() => _SuspensionHistoryScreenState();
+}
+
+class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
+  String _selectedFilter = 'All'; // 'All', 'Fork', 'Shock'
+
+  List<SuspensionSettings> getFilteredSettings() {
+    if (_selectedFilter == 'Fork') {
+      return widget.forkSettingsHistory;
+    } else if (_selectedFilter == 'Shock') {
+      return widget.shockSettingsHistory;
+    } else {
+      return [...widget.forkSettingsHistory, ...widget.shockSettingsHistory];
+    }
   }
-
-  Navigator.pop(context, widget.suspensionSettings);
-}
-}
-
-
-
-class SettingsHistoryScreen extends StatelessWidget {
-  final List<BicycleSettings> forkSettings;
-  final List<BicycleSettings> shockSettings;
-
-  SettingsHistoryScreen({required this.forkSettings, required this.shockSettings});
 
   @override
   Widget build(BuildContext context) {
-    final itemCount = forkSettings.length < shockSettings.length ? forkSettings.length : shockSettings.length;
-    int maxItemCount = max(forkSettings.length, shockSettings.length);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings History'),
+        title: Text('Suspension Settings History'),
       ),
-      body: ListView.builder(
-        
-        itemCount: maxItemCount,
-        
-        itemBuilder: (context, index) {
-          final forkSetting = forkSettings[index];
-          final shockSetting = shockSettings[index];
-          return ListTile(
-            title: Text('Date: ${forkSetting.dateTime.toString().substring(0,19)}'),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('Fork Settings', style: Theme.of(context).textTheme.headline6),
-                Text('Pressure: ${forkSetting.pressure}'),
-                Text('High-Speed Rebound: ${forkSetting.highSpeedRebound}'),
-                Text('High-Speed Damping: ${forkSetting.highSpeedDamping}'),
-                Text('Low-Speed Rebound: ${forkSetting.lowSpeedRebound}'),
-                Text('Low-Speed Damping: ${forkSetting.lowSpeedDamping}'),
-                Text('Setting was good: ${forkSetting.likeSetting}'),
-                Text('Comment: ${forkSetting.comment}'),
-                Divider(),
-                Text('Shock Settings', style: Theme.of(context).textTheme.headline6),
-                Text('Date: ${shockSetting.dateTime.toString().substring(0,19)}'),
-                Text('Pressure: ${shockSetting.pressure}'),
-                Text('High-Speed Rebound: ${shockSetting.highSpeedRebound}'),
-                Text('High-Speed Damping: ${shockSetting.highSpeedDamping}'),
-                Text('Low-Speed Rebound: ${shockSetting.lowSpeedRebound}'),
-                Text('Low-Speed Damping: ${shockSetting.lowSpeedDamping}'),
-                Text('Setting was good: ${shockSetting.likeSetting}'),
-                Text('Comment: ${shockSetting.comment}'),
-              ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: DropdownButton<String>(
+              value: _selectedFilter,
+              onChanged: (value) {
+                setState(() {
+                  _selectedFilter = value!;
+                });
+              },
+              items: <String>['All', 'Fork', 'Shock']
+                  .map<DropdownMenuItem<String>>(
+                    (String value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    ),
+                  )
+                  .toList(),
             ),
-          );
-        },
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: getFilteredSettings().length,
+              itemBuilder: (context, index) {
+                final setting = getFilteredSettings()[index];
+                return ListTile(
+                  title: Text('Date: ${setting.dateTime.toString()}'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      if (setting.pressure != 0) ...[
+                        Text('Fork Settings:'),
+                        Text('Pressure: ${setting.pressure}'),
+                        Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
+                        Text('High-Speed Damping: ${setting.highSpeedDamping}'),
+                        Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
+                        Text('Low-Speed Damping: ${setting.lowSpeedRebound}'),
+                        Text('Fork Setting was good: ${setting.likeSetting}'),
+                        Text('Fork Comment: ${setting.comment}'),
+                        SizedBox(height: 10),
+                      ],
+                      if (setting.pressure != 0) ...[
+                        Text('Shock Settings:'),
+                        Text('Pressure: ${setting.pressure}'),
+                        Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
+                        Text('High-Speed Damping: ${setting.highSpeedDamping}'),
+                        Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
+                        Text('Low-Speed Damping: ${setting.lowSpeedDamping}'),
+                        Text('Shock Setting was good: ${setting.likeSetting}'),
+                        Text('Shock Comment: ${setting.comment}'),
+                        SizedBox(height: 10),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
