@@ -498,9 +498,11 @@ class _BicycleDetailsState extends State<BicycleDetails> {
 
     widget.updateSettings(widget.suspensionSettings);
     //widget.bicycle.settingsHistory = [...widget.bicycle.settingsHistory, settings];
-    widget.bicycle.forksettingsHistory = [...widget.bicycle.forksettingsHistory, settings];
-    widget.bicycle.shocksettingsHistory = [...widget.bicycle.shocksettingsHistory, settings];
-    //Navigator.pop(context);
+     if (widget.suspensionSettings == widget.bicycle.forkSettings) {
+      widget.bicycle.forksettingsHistory = [...widget.bicycle.forksettingsHistory, settings];
+      } else if (widget.suspensionSettings == widget.bicycle.shockSettings) {
+      widget.bicycle.shocksettingsHistory = [...widget.bicycle.shocksettingsHistory, settings];
+     }
 
     Navigator.pop(context, widget.suspensionSettings);
   }   
@@ -527,7 +529,7 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
   List<String> _filters = ['All', 'Fork', 'Shock'];
   String _selectedFilter = 'All'; // 'All', 'Fork', 'Shock'
 
-  List<SuspensionSettings> getFilteredSettings() {
+  /*List<SuspensionSettings> getFilteredSettings() {
     if (_selectedFilter == 'Fork') {
       return widget.forkSettingsHistory;
     } else if (_selectedFilter == 'Shock') {
@@ -535,7 +537,25 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
     } else {
       return [...widget.forkSettingsHistory, ...widget.shockSettingsHistory];
     }
-  }
+  }*/ 
+  
+  List<SuspensionSettings> getFilteredSettings() {
+  if (_selectedFilter == 'Fork') {
+    return widget.forkSettingsHistory;
+  } else if (_selectedFilter == 'Shock') {
+    return widget.shockSettingsHistory;
+  } else {
+    if (_selectedFilter == 'All') {
+      // Wenn der Filter "All" ist, kombinieren Sie die Gabel- und Stoßdämpfereinstellungen nicht.
+      List<SuspensionSettings> allSettings = [];
+      allSettings.addAll(widget.forkSettingsHistory);
+      allSettings.addAll(widget.shockSettingsHistory);
+      return allSettings;
+      
+    }
+  }  
+      throw Exception() ;  
+}
 
   @override
   Widget build(BuildContext context) {
@@ -565,43 +585,43 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: getFilteredSettings().length,
-              itemBuilder: (context, index) {
-                final setting = getFilteredSettings()[index];
-                return ListTile(
-                  title: Text('Date: ${setting.dateTime.toString()}'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      if (setting.pressure != 0 && (_selectedFilter == 'All' || _selectedFilter == 'Fork')) ...[
-                        Text('Fork Settings:'),
-                        Text('Pressure: ${setting.pressure}'),
-                        Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
-                        Text('High-Speed Damping: ${setting.highSpeedDamping}'),
-                        Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
-                        Text('Low-Speed Damping: ${setting.lowSpeedRebound}'),
-                        Text('Fork Setting was good: ${setting.likeSetting}'),
-                        Text('Fork Comment: ${setting.comment}'),
-                        SizedBox(height: 10),
-                      ],
-                      if (setting.pressure != 0 && (_selectedFilter == 'All' || _selectedFilter == 'Shock')) ...[
-                        Text('Shock Settings:'),
-                        Text('Pressure: ${setting.pressure}'),
-                        Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
-                        Text('High-Speed Damping: ${setting.highSpeedDamping}'),
-                        Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
-                        Text('Low-Speed Damping: ${setting.lowSpeedDamping}'),
-                        Text('Shock Setting was good: ${setting.likeSetting}'),
-                        Text('Shock Comment: ${setting.comment}'),
-                        SizedBox(height: 10),
-                      ],
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+  child: ListView.builder(
+    itemCount: getFilteredSettings().length,
+    itemBuilder: (context, index) {
+      final setting = getFilteredSettings()[index];
+      return ListTile(
+        title: Text('Date: ${setting.dateTime.toString()}'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if ((_selectedFilter == 'All' || _selectedFilter == 'Fork') && widget.forkSettingsHistory.contains(setting)) ...[
+              Text('Fork Settings:'),
+              Text('Pressure: ${setting.pressure}'),
+              Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
+              Text('High-Speed Damping: ${setting.highSpeedDamping}'),
+              Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
+              Text('Low-Speed Damping: ${setting.lowSpeedRebound}'),
+              Text('Fork Setting was good: ${setting.likeSetting}'),
+              Text('Fork Comment: ${setting.comment}'),
+              SizedBox(height: 10),
+            ],
+            if ((_selectedFilter == 'All' || _selectedFilter == 'Shock') && widget.shockSettingsHistory.contains(setting)) ...[
+              Text('Shock Settings:'),
+              Text('Pressure: ${setting.pressure}'),
+              Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
+              Text('High-Speed Damping: ${setting.highSpeedDamping}'),
+              Text('Low-Speed Rebound: ${setting.lowSpeedRebound}'),
+              Text('Low-Speed Damping: ${setting.lowSpeedDamping}'),
+              Text('Shock Setting was good: ${setting.likeSetting}'),
+              Text('Shock Comment: ${setting.comment}'),
+              SizedBox(height: 10),
+            ],
+          ],
+        ),
+      );
+    },
+  ),
+),
         ],
       ),
     );
