@@ -303,7 +303,7 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
                 ),
               ), 
               onTap: (){
-              currentSettings = widget.bicycle.forkSettings;
+              currentSettings = widget.bicycle.shockSettings;
                             Navigator.push(
                               context,                          
                                MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle , suspensionSettings: currentShockSettings, updateSettings: updateSettings)),
@@ -500,7 +500,7 @@ class _BicycleDetailsState extends State<BicycleDetails> {
     //widget.bicycle.settingsHistory = [...widget.bicycle.settingsHistory, settings];
     widget.bicycle.forksettingsHistory = [...widget.bicycle.forksettingsHistory, settings];
     widget.bicycle.shocksettingsHistory = [...widget.bicycle.shocksettingsHistory, settings];
-    Navigator.pop(context);
+    //Navigator.pop(context);
 
     Navigator.pop(context, widget.suspensionSettings);
   }   
@@ -524,6 +524,7 @@ class SuspensionHistoryScreen extends StatefulWidget {
 }
 
 class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
+  List<String> _filters = ['All', 'Fork', 'Shock'];
   String _selectedFilter = 'All'; // 'All', 'Fork', 'Shock'
 
   List<SuspensionSettings> getFilteredSettings() {
@@ -547,21 +548,20 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: DropdownButton<String>(
-              value: _selectedFilter,
-              onChanged: (value) {
-                setState(() {
-                  _selectedFilter = value!;
-                });
-              },
-              items: <String>['All', 'Fork', 'Shock']
-                  .map<DropdownMenuItem<String>>(
-                    (String value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    ),
-                  )
-                  .toList(),
+            child: Wrap(
+              spacing: 8.0,
+              runSpacing: 4.0,
+              children: _filters.map((filter) {
+                return FilterChip(
+                  label: Text(filter),
+                  selected: _selectedFilter == filter,
+                  onSelected: (selected) {
+                    setState(() {
+                      _selectedFilter = filter;
+                    });
+                  },
+                );
+              }).toList(),
             ),
           ),
           Expanded(
@@ -574,7 +574,7 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      if (setting.pressure != 0) ...[
+                      if (setting.pressure != 0 && (_selectedFilter == 'All' || _selectedFilter == 'Fork')) ...[
                         Text('Fork Settings:'),
                         Text('Pressure: ${setting.pressure}'),
                         Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
@@ -585,7 +585,7 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
                         Text('Fork Comment: ${setting.comment}'),
                         SizedBox(height: 10),
                       ],
-                      if (setting.pressure != 0) ...[
+                      if (setting.pressure != 0 && (_selectedFilter == 'All' || _selectedFilter == 'Shock')) ...[
                         Text('Shock Settings:'),
                         Text('Pressure: ${setting.pressure}'),
                         Text('High-Speed Rebound: ${setting.highSpeedRebound}'),
@@ -607,3 +607,4 @@ class _SuspensionHistoryScreenState extends State<SuspensionHistoryScreen> {
     );
   }
 }
+
