@@ -7,7 +7,13 @@ void main() {
 }
 
 // Reifendruck vorne hinten fehlt noch 
-
+// Add persistene speicherung der daten 
+// Add seriennummer 
+// Add functionality to edit the name of the bike
+// add brand and model for the suspension
+// add suspension - bei mehreren dämpfern/Gabeln
+// Add Strava connection mit "Betriebsstundenzähler"
+// Add Picture of the bike 
 
 
 class Bicycle {
@@ -15,6 +21,7 @@ class Bicycle {
   final String model;
   final SuspensionSettings forkSettings; 
   final SuspensionSettings shockSettings;
+  final tireSettings tirePressureSettings;
   List<SuspensionSettings> forksettingsHistory;
   List<SuspensionSettings> shocksettingsHistory;
   
@@ -24,18 +31,29 @@ class Bicycle {
     required this.model,
     required this.forkSettings,
     required this.shockSettings,
+    required this.tirePressureSettings,
     this.forksettingsHistory = const [], 
     this.shocksettingsHistory = const [],   
   });
 }
 
+class tireSettings{
+  double frontTirePressure;
+  double rearTirePressure;
+
+  tireSettings({
+    this.frontTirePressure = 0,
+    this.rearTirePressure = 0,
+  });
+}
+
 class SuspensionSettings {
   final DateTime dateTime;
-  double pressure;
-  double highSpeedRebound;
-  double highSpeedDamping;
-  double lowSpeedRebound;
-  double lowSpeedDamping;
+  int pressure;
+  int highSpeedRebound;
+  int highSpeedDamping;
+  int lowSpeedRebound;
+  int lowSpeedDamping;
   bool likeSetting;
   String comment;
   bool like;
@@ -179,7 +197,8 @@ class _AddBicycleScreenState extends State<AddBicycleScreen> {
         brand: brandController.text,
         model: modelController.text,
         forkSettings: SuspensionSettings(dateTime: DateTime.now()),
-        shockSettings: SuspensionSettings(dateTime: DateTime.now()), );
+        shockSettings: SuspensionSettings(dateTime: DateTime.now()),
+        tirePressureSettings: tireSettings() );
 
       Navigator.pop(context, newBicycle);
     } else {
@@ -246,7 +265,7 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.bicycle.brand} ${widget.bicycle.model} Suspension Settings'),
+        title: Text('${widget.bicycle.brand} ${widget.bicycle.model} Settings'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -312,6 +331,33 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
                                                           );
                           },  
             ),
+            InkWell(
+              child:
+                Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Tire Settings', style: Theme.of(context).textTheme.headline6),
+                      SizedBox(height: 10),
+                      Text('Front Tire Pressure: ${widget.bicycle.tirePressureSettings.frontTirePressure} psi'),
+                      Text('Rear Tire Pressure: ${widget.bicycle.tirePressureSettings.rearTirePressure} psi'),
+                                            
+                      SizedBox(height: 10),
+                      
+                    ],
+                  ),
+                ),
+              ), 
+              onTap: (){
+              currentSettings = widget.bicycle.shockSettings;
+                            Navigator.push(
+                              context,                          
+                               MaterialPageRoute(builder: (context) => BicycleDetails(bicycle: widget.bicycle , suspensionSettings: currentShockSettings, updateSettings: updateSettings)),
+                                                          );
+                          },  
+            ),
             
             SizedBox(height: 20),
             ElevatedButton(
@@ -335,9 +381,28 @@ class _SuspensionSettingsScreenState extends State<SuspensionSettingsScreen> {
     );
   }
 }
+class TireSettingsEditor extends StatefulWidget {
+  final Bicycle bicycle;
+  final tireSettings TireSettings;
 
-// hier muss noch Federgabel oder Dämpfer übergeben werden 
-// Bisheriger Code 
+
+  TireSettingsEditor({required this.bicycle, required this.TireSettings});
+
+
+  @override
+  _TireSettingsEditorState createState() => _TireSettingsEditorState();
+}
+
+class _TireSettingsEditorState extends State<TireSettingsEditor> {
+  
+}
+
+
+
+
+
+
+
 class BicycleDetails extends StatefulWidget {
   final Bicycle bicycle;
   final SuspensionSettings suspensionSettings;
@@ -354,11 +419,11 @@ class _BicycleDetailsState extends State<BicycleDetails> {
   bool liked = false;
   String comment = '';
 
-  late double pressureValue;
-  late double highSpeedReboundValue;
-  late double highSpeedDampingValue;
-  late double lowSpeedReboundValue;
-  late double lowSpeedDampingValue;
+  late int pressureValue;
+  late int highSpeedReboundValue;
+  late int highSpeedDampingValue;
+  late int lowSpeedReboundValue;
+  late int lowSpeedDampingValue;
 
   @override
   void initState() {
@@ -445,7 +510,7 @@ class _BicycleDetailsState extends State<BicycleDetails> {
     );
   }
 
-  Widget _buildSettingRow(String label, double value, Function(double) onChanged) {
+  Widget _buildSettingRow(String label, int value, Function(int) onChanged) {
     return Row(
       children: [
         Expanded(
